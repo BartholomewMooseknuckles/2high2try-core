@@ -1,0 +1,33 @@
+name: 2high2try-core
+version: '${version}'
+main: com.twohigh.core.TwoHigh2TryCore
+api-version: '1.21'
+description: DarkRP game mode framework - economy, raids, mugging, PvP, claims, PD, detection API
+authors: [BartholomewMooseknuckles]
+softdepend: [Vault, WorldGuard, Citizens, DiscordSRV, CoreProtect, FancyHolograms]
+
+commands:
+  balance:
+    description: Show your cash on hand and bank balance
+    aliases: [bal, money]
+    permission: twohigh.use
+  pay:
+    description: Pay another player from your cash or bank
+    usage: /pay <player> <amount>
+    permission: twohigh.use
+  advert:
+    description: Advert system for raids and mugging
+    usage: /advert <raid|defend|counter|mug> [args]
+    permission: twohigh.use
+  job:
+    description: View and manage your job
+    usage: /job [list|join|quit]
+    permission: twohigh.use
+
+permissions:
+  twohigh.use:
+    description: Basic player access to the DarkRP game mode
+    default: true
+  twohigh.admin:
+    description: Admin access to the DarkRP game mode
+    default: op

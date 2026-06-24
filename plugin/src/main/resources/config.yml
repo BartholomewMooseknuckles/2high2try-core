@@ -1,0 +1,40 @@
+## 2high2try-core configuration
+## All numbers are placeholders — tune during playtest.
+
+mysql:
+  host: localhost
+  port: 3306
+  database: twohigh2try
+  username: root
+  password: ""
+
+pvp:
+  overworld_enabled: false
+  nether_enabled: true
+  end_enabled: true
+  combat_tag_seconds: 60
+
+raids:
+  advert_cost: 5000
+  coord_publish_delay_seconds: 60
+  bubble_radius: 32
+  per_base_cooldown_minutes: 30
+  same_raider_same_base_cooldown_hours: 24
+
+mugging:
+  cap: 10000
+  cooldown_minutes: 20
+
+economy:
+  printer_yield_per_hour: 500
+
+pd:
+  salary_per_interval: 500
+  salary_interval_minutes: 30
+  seize_bonus_pct: 25
+
+dog:
+  sit_radius: 50
+  treat_interval_seconds: 60
+  distance_falloff_exponent: 2.0
+  grow_site_merge_radius: 50

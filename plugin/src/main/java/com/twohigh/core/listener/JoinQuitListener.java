@@ -17,11 +17,19 @@ public final class JoinQuitListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent event) {
-        plugin.cashManager().loadPlayer(event.getPlayer().getUniqueId());
+        java.util.UUID uuid = event.getPlayer().getUniqueId();
+        plugin.cashManager().loadPlayer(uuid);
+        if (plugin.jobRegistry() != null) {
+            plugin.jobRegistry().loadPlayer(uuid);
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent event) {
-        plugin.cashManager().unloadPlayer(event.getPlayer().getUniqueId());
+        java.util.UUID uuid = event.getPlayer().getUniqueId();
+        plugin.cashManager().unloadPlayer(uuid);
+        if (plugin.jobRegistry() != null) {
+            plugin.jobRegistry().unloadPlayer(uuid);
+        }
     }
 }

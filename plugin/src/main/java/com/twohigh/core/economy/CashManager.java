@@ -2,6 +2,8 @@ package com.twohigh.core.economy;
 
 import com.twohigh.core.data.CoreStorage;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
@@ -65,6 +67,10 @@ public final class CashManager {
         double amount = previous == null ? 0.0 : previous;
         storage.saveCash(player, 0.0);
         return amount;
+    }
+
+    public Map<UUID, Double> allCash() {
+        return Collections.unmodifiableMap(cache);
     }
 
     public void flushAll() {

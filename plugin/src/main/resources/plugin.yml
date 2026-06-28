@@ -23,6 +23,78 @@ commands:
     description: View and manage your job
     usage: /job [list|join|quit]
     permission: twohigh.use
+  wanted:
+    description: Mark a player as wanted or list wanted players
+    usage: /wanted [player] [reason]
+    permission: twohigh.use
+  warrant:
+    description: Issue or revoke a search warrant
+    usage: /warrant <player> [reason]
+    permission: twohigh.use
+  arrest:
+    description: Arrest a wanted player
+    usage: /arrest <player>
+    permission: twohigh.use
+  unarrest:
+    description: Release a jailed player early
+    usage: /unarrest <player>
+    permission: twohigh.use
+  setjail:
+    description: Set a jail position at your location
+    usage: /setjail [name]
+    permission: twohigh.admin
+  lockdown:
+    description: Toggle city lockdown (Mayor/Chief only)
+    usage: /lockdown
+    permission: twohigh.use
+  license:
+    description: Check, grant, or revoke gun licenses
+    usage: /license [grant|revoke] [player]
+    permission: twohigh.use
+  g:
+    description: Send a message to your job team or toggle group chat mode
+    usage: /g [message]
+    aliases: [groupchat, teamchat]
+    permission: twohigh.use
+  ooc:
+    description: Send a message to global OOC chat
+    usage: /ooc <message>
+    permission: twohigh.use
+  agenda:
+    description: View, set, or clear your team agenda
+    usage: /agenda [set <message>|clear]
+    permission: twohigh.use
+  vote:
+    description: Start a job election or cast your vote
+    usage: /vote start <job_id>|yes|no
+    permission: twohigh.use
+  demote:
+    description: Start a demote vote or cast your vote
+    usage: /demote <player>|yes|no
+    permission: twohigh.use
+  stats:
+    description: View kill/death stats
+    usage: /stats [player]
+    permission: twohigh.use
+  sidebar:
+    description: Toggle the scoreboard sidebar
+    usage: /sidebar [off]
+    aliases: [hud]
+    permission: twohigh.use
+  cheque:
+    description: Write a cheque from your cash balance
+    usage: /cheque <amount>
+    aliases: [check]
+    permission: twohigh.use
+  party:
+    description: Party management - create, invite, kick, disband, bank
+    usage: /party <create|invite|accept|leave|kick|disband|list|ff|role|deposit|withdraw|bank>
+    permission: twohigh.use
+  p:
+    description: Send a message to your party
+    usage: /p <message>
+    aliases: [partychat, pchat]
+    permission: twohigh.use
 
 permissions:
   twohigh.use:

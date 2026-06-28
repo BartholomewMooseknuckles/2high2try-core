@@ -1,6 +1,8 @@
 package com.twohigh.core.command;
 
 import com.twohigh.core.TwoHigh2TryCore;
+import com.twohigh.core.mug.MugSession;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -10,6 +12,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public final class PayCommand implements CommandExecutor, TabCompleter {
 
@@ -49,6 +52,16 @@ public final class PayCommand implements CommandExecutor, TabCompleter {
             player.sendMessage("§cAmount must be positive.");
             return true;
         }
+
+        Optional<MugSession> mugOpt = plugin.mugManager().getSessionByVictim(player.getUniqueId());
+        if (mugOpt.isPresent()) {
+            MugSession session = mugOpt.get();
+            if (session.mugger().equals(target.getUniqueId()) && amount >= session.amount()) {
+                plugin.mugManager().resolveMug(session.mugger(), true);
+                return true;
+            }
+        }
+
         if (!plugin.economyService().hasCash(player, amount)) {
             if (!plugin.economyService().hasBankBalance(player, amount)) {
                 player.sendMessage("§cYou don't have enough money.");
@@ -74,7 +87,7 @@ public final class PayCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
         if (args.length == 1) {
-            return null; // default player list
+            return null;
         }
         return Collections.emptyList();
     }

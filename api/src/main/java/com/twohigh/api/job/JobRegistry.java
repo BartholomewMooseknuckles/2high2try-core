@@ -19,4 +19,10 @@ public interface JobRegistry {
     boolean setPlayerJob(UUID player, String jobId);
 
     boolean clearPlayerJob(UUID player);
+
+    int getPlayersInJob(String jobId);
+
+    int getAvailableSlots(String jobId);
+
+    String getPlayerTeam(UUID player);
 }

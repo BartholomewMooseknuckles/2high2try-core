@@ -31,10 +31,14 @@ public final class MoneyPrinterManager {
     private final TwoHigh2TryCore plugin;
     private final ConcurrentHashMap<Location, MoneyPrinter> printers = new ConcurrentHashMap<>();
     private BukkitTask tickTask;
+    private BukkitTask saveTask;
 
     public MoneyPrinterManager(TwoHigh2TryCore plugin) {
         this.plugin = plugin;
         this.tickTask = Bukkit.getScheduler().runTaskTimer(plugin, this::tick, 20L * 60, 20L * 60);
+        this.saveTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, this::persistAll, 20L * 300, 20L * 300);
+
+        loadFromDatabase();
     }
 
     public static ItemStack createPrinterItem() {
@@ -61,6 +65,9 @@ public final class MoneyPrinterManager {
 
         MoneyPrinter printer = new MoneyPrinter(UUID.randomUUID(), player.getUniqueId(), location);
         printers.put(location, printer);
+        plugin.storage().savePrinter(printer.id(), player.getUniqueId(),
+                location.getWorld().getName(), location.getBlockX(), location.getBlockY(),
+                location.getBlockZ(), 0, printer.placedAt());
         player.sendMessage("§a[PRINTER] Money printer placed! Collect earnings by right-clicking.");
         return true;
     }
@@ -76,6 +83,7 @@ public final class MoneyPrinterManager {
         double collected = printer.collectAndReset();
         if (collected > 0) {
             plugin.cashManager().deposit(player.getUniqueId(), collected);
+            plugin.storage().updatePrinterAccumulated(printer.id(), 0);
             player.sendMessage("§a[PRINTER] Collected $" + String.format("%.2f", collected) + "!");
         } else {
             player.sendMessage("§7[PRINTER] Nothing to collect yet.");
@@ -84,11 +92,18 @@ public final class MoneyPrinterManager {
     }
 
     public boolean removePrinter(Location location) {
-        return printers.remove(location) != null;
+        MoneyPrinter printer = printers.remove(location);
+        if (printer == null) return false;
+        plugin.storage().removePrinter(printer.id());
+        return true;
     }
 
     public Optional<MoneyPrinter> getPrinter(Location location) {
         return Optional.ofNullable(printers.get(location));
+    }
+
+    public boolean printerReturnsItem() {
+        return plugin.coreConfig().printerReturnsItemOnBreak();
     }
 
     private void tick() {
@@ -97,10 +112,33 @@ public final class MoneyPrinterManager {
             Block block = printer.location().getBlock();
             if (block.getType() != Material.EMERALD_BLOCK) {
                 printers.remove(printer.location());
+                plugin.storage().removePrinter(printer.id());
                 continue;
             }
             printer.addAccumulated(yieldPerTick);
         }
+    }
+
+    private void persistAll() {
+        for (MoneyPrinter printer : printers.values()) {
+            plugin.storage().updatePrinterAccumulated(printer.id(), printer.accumulated());
+        }
+    }
+
+    private void loadFromDatabase() {
+        plugin.storage().loadAllPrinters().thenAccept(loaded -> {
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                for (MoneyPrinter printer : loaded) {
+                    Block block = printer.location().getBlock();
+                    if (block.getType() == Material.EMERALD_BLOCK) {
+                        printers.put(printer.location(), printer);
+                    } else {
+                        plugin.storage().removePrinter(printer.id());
+                    }
+                }
+                plugin.getLogger().info("Loaded " + printers.size() + " money printers from database.");
+            });
+        });
     }
 
     public void shutdown() {
@@ -108,6 +146,11 @@ public final class MoneyPrinterManager {
             tickTask.cancel();
             tickTask = null;
         }
+        if (saveTask != null) {
+            saveTask.cancel();
+            saveTask = null;
+        }
+        persistAll();
     }
 
     public int activePrinters() {

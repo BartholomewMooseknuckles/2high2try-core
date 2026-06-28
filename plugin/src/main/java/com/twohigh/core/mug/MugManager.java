@@ -41,13 +41,13 @@ public final class MugManager {
             return false;
         }
 
-        if (activeMugs.containsKey(muggerId) || activeMugs.containsKey(victimId)) {
+        if (activeMugs.containsKey(muggerId) || getSessionByVictim(victimId).isPresent()) {
             mugger.sendMessage("§cA mugging is already in progress.");
             return false;
         }
 
-        if (!plugin.pvpManager().isPvPEnabled(mugger.getLocation())) {
-            mugger.sendMessage("§cYou can't mug someone where PvP is disabled.");
+        if (mugger.getLocation().distance(victim.getLocation()) > config.mugMaxDistance()) {
+            mugger.sendMessage("§cYou must be within " + config.mugMaxDistance() + " blocks to mug.");
             return false;
         }
 
@@ -62,12 +62,15 @@ public final class MugManager {
         mugger.sendMessage("§c§l[MUG] §7Mugging §e" + victim.getName() + " §7for §a$"
                 + String.format("%.2f", amount) + "§7. Waiting for response...");
 
+        plugin.pvpManager().addMugPvPPair(muggerId, victimId);
+
+        int windowTicks = config.mugWindowSeconds() * 20;
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             MugSession s = activeMugs.get(muggerId);
             if (s != null && !s.resolved()) {
                 resolveMug(muggerId, false);
             }
-        }, 20L * 30);
+        }, windowTicks);
 
         return true;
     }
@@ -76,6 +79,8 @@ public final class MugManager {
         MugSession session = activeMugs.remove(muggerId);
         if (session == null || session.resolved()) return;
         session.setResolved(true);
+
+        plugin.pvpManager().removeMugPvPPair(session.mugger(), session.victim());
 
         Player mugger = Bukkit.getPlayer(session.mugger());
         Player victim = Bukkit.getPlayer(session.victim());

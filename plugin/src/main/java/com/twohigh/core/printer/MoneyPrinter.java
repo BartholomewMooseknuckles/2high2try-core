@@ -20,6 +20,14 @@ public final class MoneyPrinter {
         this.placedAt = System.currentTimeMillis();
     }
 
+    public MoneyPrinter(UUID id, UUID owner, Location location, double accumulated, long placedAt) {
+        this.id = id;
+        this.owner = owner;
+        this.location = location;
+        this.accumulated = accumulated;
+        this.placedAt = placedAt;
+    }
+
     public UUID id() { return id; }
     public UUID owner() { return owner; }
     public Location location() { return location; }

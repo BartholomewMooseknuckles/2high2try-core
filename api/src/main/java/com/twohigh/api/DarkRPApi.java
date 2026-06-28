@@ -1,11 +1,17 @@
 package com.twohigh.api;
 
+import com.twohigh.api.cheque.ChequeApi;
 import com.twohigh.api.claim.ClaimApi;
 import com.twohigh.api.detection.DetectionApi;
 import com.twohigh.api.economy.EconomyApi;
+import com.twohigh.api.entity.EntityRegistryApi;
 import com.twohigh.api.job.JobRegistry;
+import com.twohigh.api.law.LawEnforcementApi;
+import com.twohigh.api.party.PartyApi;
 import com.twohigh.api.pvp.CombatTagApi;
 import com.twohigh.api.pvp.PvPApi;
+import com.twohigh.api.scoreboard.ScoreboardApi;
+import com.twohigh.api.social.SocialApi;
 
 public interface DarkRPApi {
 
@@ -20,6 +26,18 @@ public interface DarkRPApi {
     PvPApi pvp();
 
     CombatTagApi combatTag();
+
+    LawEnforcementApi law();
+
+    EntityRegistryApi entities();
+
+    SocialApi social();
+
+    ScoreboardApi scoreboard();
+
+    ChequeApi cheques();
+
+    PartyApi party();
 
     static DarkRPApi get() {
         DarkRPApi api = Holder.INSTANCE;

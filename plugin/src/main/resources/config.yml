@@ -18,15 +18,23 @@ raids:
   advert_cost: 5000
   coord_publish_delay_seconds: 60
   bubble_radius: 32
+  duration_seconds: 1800
+  abandon_grace_seconds: 30
   per_base_cooldown_minutes: 30
   same_raider_same_base_cooldown_hours: 24
+  cooldown_floor_minutes: 5
+  cooldown_minutes_per_percent: 1
+  cooldown_max_minutes: 120
 
 mugging:
   cap: 10000
   cooldown_minutes: 20
+  window_seconds: 30
+  max_distance: 6
 
 economy:
   printer_yield_per_hour: 500
+  printer_returns_item_on_break: false
 
 pd:
   salary_per_interval: 500
@@ -38,3 +46,23 @@ dog:
   treat_interval_seconds: 60
   distance_falloff_exponent: 2.0
   grow_site_merge_radius: 50
+
+law:
+  jail_time_seconds: 120
+  warrant_expire_seconds: 300
+  lockdown_slowness_level: 1
+
+defaults:
+  salary_interval_minutes: 30
+  disabled_jobs: []
+
+party:
+  max_size_default: 6
+  friendly_fire_mode: party_choice
+  persistence: false
+
+chat:
+  local_radius: 50
+  whisper_radius: 10
+  yell_radius: 150
+  show_job_title: true

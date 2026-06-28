@@ -8,12 +8,12 @@ public final class RaidCooldownTracker {
     private final ConcurrentHashMap<String, Long> baseCooldowns = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Long> raiderBaseCooldowns = new ConcurrentHashMap<>();
 
-    public boolean isBaseOnCooldown(String regionId, long cooldownMs) {
+    public boolean isBaseOnCooldown(String regionId) {
         Long until = baseCooldowns.get(regionId);
         return until != null && System.currentTimeMillis() < until;
     }
 
-    public boolean isRaiderOnCooldownForBase(UUID raider, String regionId, long cooldownMs) {
+    public boolean isRaiderOnCooldownForBase(UUID raider, String regionId) {
         String key = raider + ":" + regionId;
         Long until = raiderBaseCooldowns.get(key);
         return until != null && System.currentTimeMillis() < until;

@@ -2,6 +2,7 @@ package com.twohigh.core.command;
 
 import com.twohigh.api.job.JobDefinition;
 import com.twohigh.core.TwoHigh2TryCore;
+import com.twohigh.core.defaults.DefaultJobs;
 import com.twohigh.core.job.JobRegistryImpl;
 
 import org.bukkit.command.Command;
@@ -58,8 +59,9 @@ public final class JobCommand implements CommandExecutor, TabCompleter {
         }
         JobDefinition j = job.get();
         player.sendMessage("§6§lYour Job");
-        player.sendMessage("§7Title: §f" + j.displayName());
+        player.sendMessage("§7Title: " + colorOf(j) + j.displayName());
         player.sendMessage("§7Type: " + (j.legal() ? "§aLegal" : "§cIllegal"));
+        player.sendMessage("§7Team: §f" + j.team());
         if (j.salary() > 0) {
             long intervalMin = j.salaryIntervalMs() / 60_000;
             player.sendMessage("§7Salary: §a$" + String.format("%.2f", j.salary())
@@ -79,7 +81,12 @@ public final class JobCommand implements CommandExecutor, TabCompleter {
             String salary = j.salary() > 0
                     ? " §7- §a$" + String.format("%.2f", j.salary()) + "/cycle"
                     : "";
-            player.sendMessage(" §e" + j.displayName() + " " + type + salary
+            String slots = "";
+            if (j.hasSlotLimit()) {
+                int taken = plugin.jobRegistry().getPlayersInJob(j.id());
+                slots = " §8[" + taken + "/" + j.maxSlots() + "]";
+            }
+            player.sendMessage(" " + colorOf(j) + j.displayName() + " " + type + salary + slots
                     + " §8(/job join " + j.id() + ")");
         }
     }
@@ -99,6 +106,7 @@ public final class JobCommand implements CommandExecutor, TabCompleter {
         }
 
         JobDefinition job = opt.get();
+
         if (job.permission() != null && !job.permission().isEmpty()
                 && !player.hasPermission(job.permission())) {
             player.sendMessage("§cYou don't have permission for this job.");
@@ -111,23 +119,51 @@ public final class JobCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
+        if (job.voteRequired()) {
+            player.sendMessage("§cThis job requires a vote. Use §e/vote start " + jobId + "§c.");
+            return;
+        }
+
+        if (job.hasSlotLimit() && registry.getPlayersInJob(jobId) >= job.maxSlots()) {
+            player.sendMessage("§cNo slots available for §e" + job.displayName() + "§c.");
+            return;
+        }
+
+        if (job.prerequisiteJobId() != null) {
+            boolean hasPrereq = current.isPresent() && current.get().equals(job.prerequisiteJobId());
+            if (!hasPrereq) {
+                Optional<JobDefinition> prereq = registry.getJob(job.prerequisiteJobId());
+                String prereqName = prereq.map(JobDefinition::displayName).orElse(job.prerequisiteJobId());
+                player.sendMessage("§cYou must be a §e" + prereqName + " §cfirst.");
+                return;
+            }
+        }
+
         if (registry.setPlayerJob(player.getUniqueId(), jobId)) {
-            player.sendMessage("§aYou are now a §e" + job.displayName() + "§a!");
+            player.sendMessage("§aYou are now a " + colorOf(job) + job.displayName() + "§a!");
         } else {
             player.sendMessage("§cFailed to join job.");
         }
     }
 
     private void quitJob(Player player) {
-        if (plugin.jobRegistry().clearPlayerJob(player.getUniqueId())) {
-            player.sendMessage("§aYou quit your job.");
-        } else {
+        JobRegistryImpl registry = plugin.jobRegistry();
+        Optional<String> current = registry.getPlayerJob(player.getUniqueId());
+        if (current.isEmpty() || current.get().equals(DefaultJobs.CITIZEN)) {
             player.sendMessage("§cYou don't have a job to quit.");
+            return;
         }
+
+        registry.setPlayerJob(player.getUniqueId(), DefaultJobs.CITIZEN);
+        player.sendMessage("§aYou quit your job and became a Citizen.");
     }
 
     private void showUsage(Player player) {
         player.sendMessage("§6Usage: §e/job [list|join <id>|quit]");
+    }
+
+    private String colorOf(JobDefinition job) {
+        return job.chatColor() != null ? job.chatColor() : "§f";
     }
 
     @Override
@@ -137,6 +173,7 @@ public final class JobCommand implements CommandExecutor, TabCompleter {
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("join")) {
             List<String> ids = plugin.jobRegistry().allJobs().stream()
+                    .filter(j -> !j.voteRequired())
                     .map(JobDefinition::id)
                     .collect(Collectors.toList());
             return filter(ids, args[1]);

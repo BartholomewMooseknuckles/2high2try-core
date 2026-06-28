@@ -34,7 +34,7 @@ public final class JobRegistryImpl implements JobRegistry {
             return;
         }
         logger.info("Registered job: " + job.displayName() + " (" + job.id()
-                + ") from " + job.owningPlugin().getName());
+                + ") [" + job.team() + "] from " + job.owningPlugin().getName());
     }
 
     @Override
@@ -65,6 +65,17 @@ public final class JobRegistryImpl implements JobRegistry {
         JobDefinition job = jobs.get(jobId);
         if (job == null) return false;
 
+        if (job.hasSlotLimit() && getPlayersInJob(jobId) >= job.maxSlots()) {
+            return false;
+        }
+
+        if (job.prerequisiteJobId() != null) {
+            String current = playerJobs.get(player);
+            if (current == null || !current.equals(job.prerequisiteJobId())) {
+                return false;
+            }
+        }
+
         String oldJob = playerJobs.put(player, jobId);
         storage.savePlayerJob(player, jobId);
         Bukkit.getPluginManager().callEvent(new JobChangeEvent(player, oldJob, jobId));
@@ -79,6 +90,31 @@ public final class JobRegistryImpl implements JobRegistry {
         storage.clearPlayerJob(player);
         Bukkit.getPluginManager().callEvent(new JobChangeEvent(player, old, null));
         return true;
+    }
+
+    @Override
+    public int getPlayersInJob(String jobId) {
+        int count = 0;
+        for (String jid : playerJobs.values()) {
+            if (jid.equals(jobId)) count++;
+        }
+        return count;
+    }
+
+    @Override
+    public int getAvailableSlots(String jobId) {
+        JobDefinition job = jobs.get(jobId);
+        if (job == null) return 0;
+        if (!job.hasSlotLimit()) return -1;
+        return Math.max(0, job.maxSlots() - getPlayersInJob(jobId));
+    }
+
+    @Override
+    public String getPlayerTeam(UUID player) {
+        String jobId = playerJobs.get(player);
+        if (jobId == null) return "civilian";
+        JobDefinition job = jobs.get(jobId);
+        return job != null ? job.team() : "civilian";
     }
 
     public void loadPlayer(UUID player) {
@@ -99,5 +135,12 @@ public final class JobRegistryImpl implements JobRegistry {
 
     public ConcurrentHashMap<UUID, String> playerJobMap() {
         return playerJobs;
+    }
+
+    public void assignIfAbsent(UUID player, String jobId) {
+        if (!playerJobs.containsKey(player) && jobs.containsKey(jobId)) {
+            playerJobs.put(player, jobId);
+            storage.savePlayerJob(player, jobId);
+        }
     }
 }

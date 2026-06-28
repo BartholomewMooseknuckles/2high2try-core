@@ -55,6 +55,62 @@ public final class MysqlMigrations {
                         INDEX idx_signal_world (world)
                     )
                     """
+            },
+            // v2: law enforcement tables
+            {
+                    """
+                    CREATE TABLE IF NOT EXISTS wanted_players (
+                        player_uuid CHAR(36) NOT NULL PRIMARY KEY,
+                        officer_uuid CHAR(36) NOT NULL,
+                        reason VARCHAR(255) NOT NULL,
+                        created_at BIGINT NOT NULL
+                    )
+                    """,
+                    """
+                    CREATE TABLE IF NOT EXISTS jail_positions (
+                        name VARCHAR(64) NOT NULL PRIMARY KEY,
+                        world VARCHAR(64) NOT NULL,
+                        x DOUBLE NOT NULL,
+                        y DOUBLE NOT NULL,
+                        z DOUBLE NOT NULL,
+                        yaw FLOAT NOT NULL
+                    )
+                    """,
+                    """
+                    CREATE TABLE IF NOT EXISTS active_arrests (
+                        player_uuid CHAR(36) NOT NULL PRIMARY KEY,
+                        release_at BIGINT NOT NULL,
+                        INDEX idx_release (release_at)
+                    )
+                    """,
+                    """
+                    CREATE TABLE IF NOT EXISTS gun_licenses (
+                        player_uuid CHAR(36) NOT NULL PRIMARY KEY,
+                        granted_at BIGINT NOT NULL
+                    )
+                    """
+            },
+            // v3: money printers + party bank
+            {
+                    """
+                    CREATE TABLE IF NOT EXISTS money_printers (
+                        id CHAR(36) NOT NULL PRIMARY KEY,
+                        owner_uuid CHAR(36) NOT NULL,
+                        world VARCHAR(64) NOT NULL,
+                        x INT NOT NULL,
+                        y INT NOT NULL,
+                        z INT NOT NULL,
+                        accumulated DOUBLE NOT NULL DEFAULT 0.0,
+                        placed_at BIGINT NOT NULL,
+                        INDEX idx_printer_owner (owner_uuid)
+                    )
+                    """,
+                    """
+                    CREATE TABLE IF NOT EXISTS party_banks (
+                        party_id CHAR(36) NOT NULL PRIMARY KEY,
+                        balance DOUBLE NOT NULL DEFAULT 0.0
+                    )
+                    """
             }
     };
 

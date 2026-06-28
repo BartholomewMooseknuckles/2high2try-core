@@ -4,6 +4,7 @@ import com.twohigh.api.claim.ClaimInfo;
 import com.twohigh.core.TwoHigh2TryCore;
 import com.twohigh.core.raid.ActiveRaid;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -31,15 +32,17 @@ public final class AdvertCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length == 0) {
-            player.sendMessage("§6Usage: §e/advert <raid|defend>");
+            player.sendMessage("§6Usage: §e/advert <raid|defend|counter|mug>");
             return true;
         }
 
         return switch (args[0].toLowerCase()) {
             case "raid" -> { handleRaid(player); yield true; }
             case "defend" -> { handleDefend(player); yield true; }
+            case "counter" -> { handleCounter(player); yield true; }
+            case "mug" -> { handleMug(player, args); yield true; }
             default -> {
-                player.sendMessage("§6Usage: §e/advert <raid|defend>");
+                player.sendMessage("§6Usage: §e/advert <raid|defend|counter|mug>");
                 yield true;
             }
         };
@@ -80,14 +83,62 @@ public final class AdvertCommand implements CommandExecutor, TabCompleter {
         }
 
         ActiveRaid raid = raidOpt.get();
+        if (raid.isAttacker(player.getUniqueId())) {
+            player.sendMessage("§cYou're already on the attacking side.");
+            return;
+        }
+
         raid.addDefender(player.getUniqueId());
         player.sendMessage("§aYou are now defending this base!");
+    }
+
+    private void handleCounter(Player player) {
+        Optional<ActiveRaid> raidOpt = plugin.raidManager().getRaidAtLocation(player.getLocation());
+        if (raidOpt.isEmpty()) {
+            player.sendMessage("§cNo active raid near you.");
+            return;
+        }
+
+        ActiveRaid raid = raidOpt.get();
+        if (raid.isDefender(player.getUniqueId())) {
+            player.sendMessage("§cYou're already on the defending side.");
+            return;
+        }
+
+        raid.addAttacker(player.getUniqueId());
+        player.sendMessage("§cYou joined the raid as a counter-raider!");
+    }
+
+    private void handleMug(Player player, String[] args) {
+        if (args.length < 3) {
+            player.sendMessage("§cUsage: /advert mug <player> <amount>");
+            return;
+        }
+
+        Player victim = Bukkit.getPlayerExact(args[1]);
+        if (victim == null || !victim.isOnline()) {
+            player.sendMessage("§cPlayer not found.");
+            return;
+        }
+
+        double amount;
+        try {
+            amount = Double.parseDouble(args[2]);
+        } catch (NumberFormatException e) {
+            player.sendMessage("§cInvalid amount.");
+            return;
+        }
+
+        plugin.mugManager().startMug(player, victim, amount);
     }
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            return filter(List.of("raid", "defend"), args[0]);
+            return filter(List.of("raid", "defend", "counter", "mug"), args[0]);
+        }
+        if (args.length == 2 && args[0].equalsIgnoreCase("mug")) {
+            return null;
         }
         return List.of();
     }

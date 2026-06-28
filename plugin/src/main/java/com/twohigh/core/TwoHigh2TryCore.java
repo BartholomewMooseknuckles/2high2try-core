@@ -88,6 +88,8 @@ import com.twohigh.core.social.command.AgendaCommand;
 import com.twohigh.core.social.command.DemoteCommand;
 import com.twohigh.core.social.command.GroupChatCommand;
 import com.twohigh.core.social.command.OocCommand;
+import com.twohigh.core.social.command.WhisperCommand;
+import com.twohigh.core.social.command.YellCommand;
 import com.twohigh.core.social.command.VoteCommand;
 
 import org.bukkit.command.PluginCommand;
@@ -213,6 +215,8 @@ public final class TwoHigh2TryCore extends JavaPlugin implements DarkRPApi {
         // Commands — social
         bindCommand("g", new GroupChatCommand(this));
         bindCommand("ooc", new OocCommand(this));
+        bindCommand("whisper", new WhisperCommand(this));
+        bindCommand("yell", new YellCommand(this));
         bindCommand("agenda", new AgendaCommand(this));
 
         // Commands — scoreboard/stats

@@ -59,6 +59,16 @@ commands:
   ooc:
     description: Send a message to global OOC chat
     usage: /ooc <message>
+    aliases: [global]
+    permission: twohigh.use
+  whisper:
+    description: Whisper a message to nearby players
+    usage: /whisper <message>
+    aliases: [tell]
+    permission: twohigh.use
+  yell:
+    description: Yell a message to players in a large radius
+    usage: /yell <message>
     permission: twohigh.use
   agenda:
     description: View, set, or clear your team agenda

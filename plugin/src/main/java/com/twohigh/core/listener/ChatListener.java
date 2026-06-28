@@ -39,22 +39,6 @@ public final class ChatListener implements Listener {
             return;
         }
 
-        if (message.startsWith("!")) {
-            String yellMsg = message.substring(1).trim();
-            if (!yellMsg.isEmpty()) {
-                plugin.socialService().chatManager().sendYellMessage(uuid, yellMsg);
-            }
-            return;
-        }
-
-        if (message.startsWith(".")) {
-            String whisperMsg = message.substring(1).trim();
-            if (!whisperMsg.isEmpty()) {
-                plugin.socialService().chatManager().sendWhisperMessage(uuid, whisperMsg);
-            }
-            return;
-        }
-
         plugin.socialService().chatManager().sendLocalMessage(uuid, message);
     }
 }

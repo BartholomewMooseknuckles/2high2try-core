@@ -105,6 +105,32 @@ commands:
     usage: /p <message>
     aliases: [partychat, pchat]
     permission: twohigh.use
+  f4:
+    description: Open the game mode menu
+    usage: /f4
+    aliases: [menu]
+    permission: twohigh.use
+
+  eco:
+    description: Admin economy management - give, take, set, reset player cash
+    usage: /eco <give|take|set|reset> <player> [amount]
+    permission: twohigh.admin
+  jobadmin:
+    description: Admin job management - force set or clear player jobs
+    usage: /jobadmin <set|clear> <player> [job_id]
+    permission: twohigh.admin
+  raidadmin:
+    description: Admin raid management - end raids, clear cooldowns
+    usage: /raidadmin <end|endall|clearcooldown>
+    permission: twohigh.admin
+  printeradmin:
+    description: Admin printer management - give, list, clear printers
+    usage: /printeradmin <give|list|clearall> [player]
+    permission: twohigh.admin
+  partyadmin:
+    description: Admin party management - disband or inspect parties
+    usage: /partyadmin <disband|info> <player>
+    permission: twohigh.admin
 
 permissions:
   twohigh.use:

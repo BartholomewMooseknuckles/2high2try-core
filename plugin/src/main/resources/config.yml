@@ -35,6 +35,7 @@ mugging:
 economy:
   printer_yield_per_hour: 500
   printer_returns_item_on_break: false
+  printer_price: 5000
 
 pd:
   salary_per_interval: 500

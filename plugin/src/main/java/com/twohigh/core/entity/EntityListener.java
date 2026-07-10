@@ -22,6 +22,37 @@ public final class EntityListener implements Listener {
         this.plugin = plugin;
     }
 
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onPlace(BlockPlaceEvent event) {
+        String entityId = EntityItems.entityId(event.getItemInHand());
+        if (entityId == null) return;
+
+        Player player = event.getPlayer();
+        Optional<EntityDefinition> defOpt = plugin.entityRegistry().getDefinition(entityId);
+        if (defOpt.isEmpty()) {
+            event.setCancelled(true);
+            player.sendMessage("§cThis item is no longer registered.");
+            return;
+        }
+        EntityDefinition def = defOpt.get();
+
+        if (def.isJobRestricted()) {
+            String job = plugin.jobRegistry().getPlayerJob(player.getUniqueId()).orElse("");
+            if (!def.allowedJobs().contains(job)) {
+                event.setCancelled(true);
+                player.sendMessage("§cYour job can't place §e" + def.displayName() + "§c.");
+                return;
+            }
+        }
+
+        if (!plugin.entityRegistry().place(player.getUniqueId(), entityId,
+                event.getBlock().getLocation())) {
+            event.setCancelled(true);
+            player.sendMessage("§cCan't place §e" + def.displayName()
+                    + "§c — placement limit reached.");
+        }
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBreak(BlockBreakEvent event) {
         Block block = event.getBlock();

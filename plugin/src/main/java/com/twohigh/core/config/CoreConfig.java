@@ -33,6 +33,7 @@ public final class CoreConfig {
 
     private int printerYieldPerHour;
     private boolean printerReturnsItemOnBreak;
+    private double printerPrice;
 
     private double pdSalaryPerInterval;
     private int pdSalaryIntervalMinutes;
@@ -97,6 +98,7 @@ public final class CoreConfig {
 
         printerYieldPerHour = c.getInt("economy.printer_yield_per_hour", 500);
         printerReturnsItemOnBreak = c.getBoolean("economy.printer_returns_item_on_break", false);
+        printerPrice = c.getDouble("economy.printer_price", 5000);
 
         pdSalaryPerInterval = c.getDouble("pd.salary_per_interval", 500);
         pdSalaryIntervalMinutes = c.getInt("pd.salary_interval_minutes", 30);
@@ -153,6 +155,7 @@ public final class CoreConfig {
     public int raidCooldownMaxMinutes() { return raidCooldownMaxMinutes; }
     public int printerYieldPerHour() { return printerYieldPerHour; }
     public boolean printerReturnsItemOnBreak() { return printerReturnsItemOnBreak; }
+    public double printerPrice() { return printerPrice; }
     public double pdSalaryPerInterval() { return pdSalaryPerInterval; }
     public int pdSalaryIntervalMinutes() { return pdSalaryIntervalMinutes; }
     public double pdSeizeBonusPct() { return pdSeizeBonusPct; }

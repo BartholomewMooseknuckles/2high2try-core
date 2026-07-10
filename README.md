@@ -106,6 +106,16 @@ DarkRP game mode framework for Paper 1.21.4. Provides the core infrastructure fo
 - **Raid auto-join**: Party members entering a raid bubble auto-join the same side as their party member.
 - **PvP protection**: Party members with FF off can't damage each other, even in PvP zones.
 
+### F4 Menu
+- `/f4` (alias `/menu`) opens the game mode's central hub as a chest GUI — works on every client, including Bedrock via Geyser later.
+- **Main menu**: your wallet (cash + job), Jobs, Shop, Leaderboard, Party tabs, plus any addon-registered tabs.
+- **Jobs tab**: browse every registered job with team, salary, slots, and requirements in the tooltip — click to join (same checks as `/job join`), barrier item to quit.
+- **Shop tab**: buy money printers (price configurable via `economy.printer_price`) and any addon-registered entities. Job restrictions and cash checks enforced at purchase and at placement.
+- **Leaderboard tab**: top 10 cash holders.
+- **Party tab**: create/leave your party, see members and bank, leader can toggle friendly fire.
+- Addons register their own tabs via `F4MenuApi` (see addon guide below).
+- The native Paper Dialog version (ESC-menu integration) is planned for the 1.21.11 server upgrade — this chest GUI stays as the fallback renderer.
+
 ### Cash Token Anti-Stash
 - Cash drop items (emeralds with PDC tag) cannot be placed into containers, hoppers, or villager trades.
 - Prevents players from hiding cash in chests to avoid losing it on death/mug.
@@ -184,6 +194,7 @@ mugging:
 
 economy:
   printer_yield_per_hour: 500
+  printer_price: 5000
 
 raids:
   duration_seconds: 1800
@@ -235,6 +246,7 @@ defaults:
 | `/sidebar [off]` | Toggle scoreboard sidebar | Everyone |
 | `/party <sub>` | Party management (create/invite/kick/etc.) | Everyone |
 | `/p <message>` | Party chat | Everyone |
+| `/f4` | Open the game mode menu (alias: `/menu`) | Everyone |
 | `/wanted [player] [reason]` | Mark wanted / list wanted | Police team |
 | `/wanted remove <player>` | Remove wanted status | Police team |
 | `/warrant <player> [reason]` | Issue a search warrant | Police team |
@@ -393,6 +405,27 @@ boolean isCheque = DarkRPApi.get().cheques().isCheque(itemStack);
 DarkRPApi.get().cheques().redeem(player, itemStack);
 ```
 
+### Register an F4 Menu Tab
+
+```java
+import com.twohigh.api.DarkRPApi;
+import com.twohigh.api.menu.F4Tab;
+import org.bukkit.Material;
+import java.util.List;
+
+DarkRPApi.get().menu().registerTab(new F4Tab(
+    "weed_shop",                       // unique id
+    "Weed Shop",                       // display name on the main menu
+    Material.SHORT_GRASS,              // icon
+    List.of("§7Buy seeds and gear."),  // tooltip lore
+    player -> openMyShopGui(player),   // click handler
+    this                               // owning plugin
+));
+
+// in onDisable:
+DarkRPApi.get().menu().unregisterTab("weed_shop");
+```
+
 ### Party API
 
 ```java
@@ -439,7 +472,7 @@ The plugin auto-creates and migrates its tables:
   api/          -> 2high2try-api (thin jar for addon developers)
     com.twohigh.api.
       DarkRPApi, economy/, job/, detection/, claim/, pvp/, event/,
-      law/, entity/, social/, scoreboard/, cheque/, party/
+      law/, entity/, social/, scoreboard/, cheque/, party/, menu/
   plugin/       -> 2high2try-core (main plugin, shadow jar)
     com.twohigh.core.
       TwoHigh2TryCore (main class, implements DarkRPApi)
@@ -466,6 +499,7 @@ The plugin auto-creates and migrates its tables:
       cheque/       ChequeManager, ChequeListener, ChequeCommand
       party/        PartyManager, Party, PartyRole, PartyCommand,
                     PartyChatCommand
+      menu/         F4MenuManager, F4MenuHolder, F4MenuListener, F4Command
       integration/  VaultHook, WorldGuardHook (+ Noop + Impl)
       command/      BalanceCommand, PayCommand, JobCommand, AdvertCommand,
                     WantedCommand, WarrantCommand, ArrestCommand,

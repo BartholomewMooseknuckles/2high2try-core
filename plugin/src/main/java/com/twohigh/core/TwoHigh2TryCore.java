@@ -8,6 +8,7 @@ import com.twohigh.api.economy.EconomyApi;
 import com.twohigh.api.entity.EntityRegistryApi;
 import com.twohigh.api.job.JobRegistry;
 import com.twohigh.api.law.LawEnforcementApi;
+import com.twohigh.api.menu.F4MenuApi;
 import com.twohigh.api.party.PartyApi;
 import com.twohigh.api.pvp.CombatTagApi;
 import com.twohigh.api.pvp.PvPApi;
@@ -21,10 +22,15 @@ import com.twohigh.core.claim.ClaimManagerImpl;
 import com.twohigh.core.command.AdvertCommand;
 import com.twohigh.core.command.ArrestCommand;
 import com.twohigh.core.command.BalanceCommand;
+import com.twohigh.core.command.EcoAdminCommand;
 import com.twohigh.core.command.GunLicenseCommand;
+import com.twohigh.core.command.JobAdminCommand;
 import com.twohigh.core.command.JobCommand;
 import com.twohigh.core.command.LockdownCommand;
+import com.twohigh.core.command.PartyAdminCommand;
 import com.twohigh.core.command.PayCommand;
+import com.twohigh.core.command.PrinterAdminCommand;
+import com.twohigh.core.command.RaidAdminCommand;
 import com.twohigh.core.command.SetJailCommand;
 import com.twohigh.core.command.WantedCommand;
 import com.twohigh.core.command.WarrantCommand;
@@ -64,6 +70,9 @@ import com.twohigh.core.listener.JoinQuitListener;
 import com.twohigh.core.listener.LawListener;
 import com.twohigh.core.listener.PrinterListener;
 import com.twohigh.core.listener.PvPListener;
+import com.twohigh.core.menu.F4Command;
+import com.twohigh.core.menu.F4MenuListener;
+import com.twohigh.core.menu.F4MenuManager;
 import com.twohigh.core.mug.MugManager;
 import com.twohigh.core.party.PartyChatCommand;
 import com.twohigh.core.party.PartyCommand;
@@ -124,6 +133,7 @@ public final class TwoHigh2TryCore extends JavaPlugin implements DarkRPApi {
     private PlayerStatsTracker statsTracker;
     private ChequeManager chequeManager;
     private PartyManager partyManager;
+    private F4MenuManager f4MenuManager;
     private BukkitTask salaryTask;
 
     @Override
@@ -165,6 +175,7 @@ public final class TwoHigh2TryCore extends JavaPlugin implements DarkRPApi {
             this.sidebarManager = new SidebarManager(this);
             this.chequeManager = new ChequeManager(this, cashManager);
             this.partyManager = new PartyManager(this);
+            this.f4MenuManager = new F4MenuManager(this);
 
             pvpManager.setRaidManager(raidManager);
             pvpManager.setPartyManager(partyManager);
@@ -191,6 +202,7 @@ public final class TwoHigh2TryCore extends JavaPlugin implements DarkRPApi {
         getServer().getPluginManager().registerEvents(new RaidLootListener(this), this);
         getServer().getPluginManager().registerEvents(new ClaimBlockListener(this), this);
         getServer().getPluginManager().registerEvents(new CashTokenListener(this), this);
+        getServer().getPluginManager().registerEvents(new F4MenuListener(), this);
 
         // Commands — economy
         bindCommand("balance", new BalanceCommand(this));
@@ -226,6 +238,16 @@ public final class TwoHigh2TryCore extends JavaPlugin implements DarkRPApi {
         // Commands — party
         bindTabCommand("party", new PartyCommand(this));
         bindCommand("p", new PartyChatCommand(this));
+
+        // Commands — menu
+        bindCommand("f4", new F4Command(this));
+
+        // Commands — admin
+        bindTabCommand("eco", new EcoAdminCommand(this));
+        bindTabCommand("jobadmin", new JobAdminCommand(this));
+        bindTabCommand("raidadmin", new RaidAdminCommand(this));
+        bindTabCommand("printeradmin", new PrinterAdminCommand(this));
+        bindTabCommand("partyadmin", new PartyAdminCommand(this));
 
         // Scheduled tasks
         SalaryTask salary = new SalaryTask(jobRegistry, cashManager);
@@ -287,6 +309,7 @@ public final class TwoHigh2TryCore extends JavaPlugin implements DarkRPApi {
         statsTracker = null;
         chequeManager = null;
         partyManager = null;
+        f4MenuManager = null;
         config = null;
         getLogger().info("2high2try-core disabled.");
     }
@@ -387,6 +410,7 @@ public final class TwoHigh2TryCore extends JavaPlugin implements DarkRPApi {
     @Override public ScoreboardApi scoreboard() { return sidebarManager; }
     @Override public ChequeApi cheques() { return chequeManager; }
     @Override public PartyApi party() { return partyManager; }
+    @Override public F4MenuApi menu() { return f4MenuManager; }
 
     // --- Internal accessors ---
 
@@ -413,4 +437,5 @@ public final class TwoHigh2TryCore extends JavaPlugin implements DarkRPApi {
     public PlayerStatsTracker statsTracker() { return statsTracker; }
     public ChequeManager chequeManager() { return chequeManager; }
     public PartyManager partyManager() { return partyManager; }
+    public F4MenuManager f4MenuManager() { return f4MenuManager; }
 }

@@ -40,4 +40,9 @@ public final class RaidCooldownTracker {
         if (until == null) return 0;
         return Math.max(0, until - System.currentTimeMillis());
     }
+
+    public void clearAll() {
+        baseCooldowns.clear();
+        raiderBaseCooldowns.clear();
+    }
 }

@@ -7,6 +7,7 @@ import com.twohigh.api.economy.EconomyApi;
 import com.twohigh.api.entity.EntityRegistryApi;
 import com.twohigh.api.job.JobRegistry;
 import com.twohigh.api.law.LawEnforcementApi;
+import com.twohigh.api.menu.F4MenuApi;
 import com.twohigh.api.party.PartyApi;
 import com.twohigh.api.pvp.CombatTagApi;
 import com.twohigh.api.pvp.PvPApi;
@@ -38,6 +39,8 @@ public interface DarkRPApi {
     ChequeApi cheques();
 
     PartyApi party();
+
+    F4MenuApi menu();
 
     static DarkRPApi get() {
         DarkRPApi api = Holder.INSTANCE;

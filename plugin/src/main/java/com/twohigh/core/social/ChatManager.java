@@ -81,8 +81,9 @@ public final class ChatManager implements ChatApi {
         Optional<String> jobId = jobRegistry.getPlayerJob(player);
         if (jobId.isEmpty()) return "§8[§7Citizen§8] ";
 
-        JobDefinition job = jobRegistry.getJob(jobId.get());
-        if (job == null) return "§8[§7Citizen§8] ";
+        Optional<JobDefinition> jobOpt = jobRegistry.getJob(jobId.get());
+        if (jobOpt.isEmpty()) return "§8[§7Citizen§8] ";
+        JobDefinition job = jobOpt.get();
 
         String color = job.chatColor() != null ? "§" + job.chatColor() : "§e";
         return "§8[" + color + job.displayName() + "§8] ";

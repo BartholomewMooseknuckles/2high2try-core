@@ -84,21 +84,23 @@ public final class TestBotListener extends ListenerAdapter {
             return;
         }
         if (posting) {
-            event.reply("Already posting a campaign — give it a minute.").setEphemeral(true).queue();
+            event.reply("A campaign is currently being posted. Please wait for it to complete.")
+                    .setEphemeral(true).queue();
             return;
         }
         boolean fresh = event.getOption("fresh") != null && event.getOption("fresh").getAsBoolean();
         if (!byMessageId.isEmpty() && !fresh) {
-            event.reply("A campaign is already posted. Use `/test start fresh:True` to wipe the "
-                            + "saved state and post a new one (old messages stay — archive or delete "
-                            + "the old threads yourself).")
+            event.reply("A campaign is already active. Run `/test start fresh:True` to reset the "
+                            + "stored results and post a new campaign. Existing messages are not "
+                            + "deleted — archive or remove the previous threads manually.")
                     .setEphemeral(true).queue();
             return;
         }
 
         TextChannel channel = event.getJDA().getTextChannelById(config.channelId());
         if (channel == null) {
-            event.reply("Configured channel_id doesn't resolve to a text channel I can see.")
+            event.reply("The configured channel_id does not resolve to a text channel "
+                            + "this bot can access.")
                     .setEphemeral(true).queue();
             return;
         }
@@ -143,10 +145,11 @@ public final class TestBotListener extends ListenerAdapter {
                 }
                 event.getHook().editOriginal("Posted **" + posted + " tests** across **"
                         + sections.size() + " sections** in " + channel.getAsMention()
-                        + ". React ✅ or ❌ on each test, reply to a test to leave a note, "
-                        + "hit the 🔁 button if it needs another look.").queue();
+                        + ".\nReact ✅ if a test passes or ❌ if it fails. Reply to a test "
+                        + "message to attach a note. Use 🔁 to flag a test for additional review.")
+                        .queue();
             } catch (Exception e) {
-                event.getHook().editOriginal("Posting failed: " + e.getMessage()).queue();
+                event.getHook().editOriginal("Failed to post the campaign: " + e.getMessage()).queue();
                 e.printStackTrace();
             } finally {
                 posting = false;
@@ -184,7 +187,8 @@ public final class TestBotListener extends ListenerAdapter {
             eb.setColor(fail > 0 ? RED : (untested > 0 ? GREY : GREEN));
             event.replyEmbeds(eb.build()).queue();
         } catch (Exception e) {
-            event.reply("Status failed: " + e.getMessage()).setEphemeral(true).queue();
+            event.reply("Failed to build the status summary: " + e.getMessage())
+                    .setEphemeral(true).queue();
         }
     }
 
@@ -196,7 +200,7 @@ public final class TestBotListener extends ListenerAdapter {
                     report.getBytes(StandardCharsets.UTF_8),
                     "2high2try-test-report.txt")).queue();
         } catch (Exception e) {
-            event.getHook().editOriginal("Report failed: " + e.getMessage()).queue();
+            event.getHook().editOriginal("Failed to generate the report: " + e.getMessage()).queue();
         }
     }
 
@@ -255,10 +259,10 @@ public final class TestBotListener extends ListenerAdapter {
         try {
             store.setRetest(num, true);
             updateEmbed(event.getJDA(), t);
-            event.reply("Flagged **#" + num + "** as needs-more-testing. Any new ✅/❌ "
-                    + "reaction clears the flag.").setEphemeral(true).queue();
+            event.reply("Test **#" + num + "** flagged for additional testing. "
+                    + "A new ✅ or ❌ vote clears the flag.").setEphemeral(true).queue();
         } catch (Exception e) {
-            event.reply("Failed: " + e.getMessage()).setEphemeral(true).queue();
+            event.reply("Failed to flag the test: " + e.getMessage()).setEphemeral(true).queue();
         }
     }
 

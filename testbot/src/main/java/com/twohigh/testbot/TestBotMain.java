@@ -46,8 +46,8 @@ public final class TestBotMain {
                                 new SubcommandData("start", "Post the full checklist into the testing channel")
                                         .addOption(OptionType.BOOLEAN, "fresh",
                                                 "Wipe saved votes/notes and post a fresh campaign", false),
-                                new SubcommandData("status", "Progress summary"),
-                                new SubcommandData("report", "Generate the TXT report file for Claude"))
+                                new SubcommandData("status", "Show campaign progress by section"),
+                                new SubcommandData("report", "Export the full campaign results as a text file"))
         ).queue(ok -> System.out.println("[testbot] Slash commands registered."));
 
         System.out.println("[testbot] Ready as " + jda.getSelfUser().getName()

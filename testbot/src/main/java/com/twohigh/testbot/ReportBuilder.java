@@ -24,7 +24,7 @@ public final class ReportBuilder {
         List<TestDefinition> untested = testable.stream().filter(t -> stateOf.apply(t).equals("none")).toList();
 
         StringBuilder sb = new StringBuilder();
-        sb.append("2high2try-core v1 TEST REPORT (Discord campaign)\n");
+        sb.append("2high2try-core v1 — Test Campaign Report\n");
         sb.append("Generated: ").append(ZonedDateTime.now()
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm z"))).append("\n");
         sb.append("Result: ").append(passed.size()).append(" passed / ")
@@ -66,7 +66,7 @@ public final class ReportBuilder {
             sb.append("\n\n");
         }
 
-        sb.append("=== KNOWN BUGS (already on v2 list, skipped) ===\n");
+        sb.append("=== KNOWN ISSUES (pre-logged, excluded from this campaign) ===\n");
         for (TestDefinition t : all) {
             if (t.isKnown()) {
                 sb.append("#").append(String.format("%02d", t.num())).append(" ")

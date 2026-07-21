@@ -23,3 +23,7 @@ desktop.ini
 
 # Extracted reference material
 weed-plugin-review/
+
+# Test bot secrets + local state (never commit the token)
+testbot/bot-config.yml
+testbot/testbot-data.db

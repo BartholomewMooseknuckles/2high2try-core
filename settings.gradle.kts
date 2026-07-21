@@ -1,3 +1,3 @@
 rootProject.name = "2high2try"
 
-include("api", "plugin")
+include("api", "plugin", "testbot")

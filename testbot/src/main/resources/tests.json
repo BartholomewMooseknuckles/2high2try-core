@@ -1,0 +1,145 @@
+[
+{"title":"1 · Boot sanity","badge":"solo","tests":[
+ {"a":"Watch console on startup","e":"Migration v1/v2/v3 lines → \"2high2try-core enabled\", no \"Startup failed\""},
+ {"a":"Join the server","e":"Sidebar appears (job, cash, K/D); auto-assigned Citizen after ~5s"},
+ {"a":"Wait for a salary cycle","e":"[Salary] +$50.00 (Citizen)"}
+]},
+{"title":"2 · F4 menu","badge":"solo","tests":[
+ {"a":"/f4","e":"Menu opens: wallet top-center, Jobs/Shop/Leaderboard/Party icons, barrier close"},
+ {"a":"/menu","e":"Same menu (alias)"},
+ {"a":"Hover the gold ingot","e":"Live cash + current job in tooltip"},
+ {"a":"Shift-click / grab menu items","e":"Nothing should enter your inventory","known":"v2 #9 — dupe confirmed: close/leave items become real blocks"},
+ {"a":"Click barrier","e":"Menu closes"},
+ {"a":"Jobs tab tooltips","e":"Team, salary, slots, requirements; current job starred"},
+ {"a":"Click Police in jobs tab","e":"Joins police, kit items appear"},
+ {"a":"Jobs tab → Quit Job barrier","e":"Back to Citizen, kit stripped"},
+ {"a":"Click Mayor in jobs tab","e":"Rejected — requires election"},
+ {"a":"Shop with $0 → click printer","e":"\"You need $5000\" message"},
+ {"a":"/eco give → shop → buy printer","e":"$5,000 deducted, printer item received"},
+ {"a":"Leaderboard tab","e":"Top players, gold block #1"},
+ {"a":"Party tab → Create Party","e":"Party created, menu reopens with party info"},
+ {"a":"Party tab → Leave Party","e":"Should return to Create Party view","known":"v2 #10 — currently closes the whole menu"},
+ {"a":"Every tab's back arrow","e":"Returns to main menu"}
+]},
+{"title":"3 · Economy","badge":"solo","tests":[
+ {"a":"/balance","e":"Cash + bank shown"},
+ {"a":"/balance <player>","e":"Should show their balance (admin)","known":"v2 #2 — always shows your own"},
+ {"a":"/pay <p2> 100","e":"Transfers cash"},
+ {"a":"/cheque 500","e":"$500 out, cheque book in hand"},
+ {"a":"Right-click cheque","e":"$500 back, book consumed"},
+ {"a":"Die with cash","e":"Emerald drops at death spot"},
+ {"a":"Walk over dropped cash","e":"Cash restored"},
+ {"a":"Shift-click cash emerald into chest","e":"Blocked with message"},
+ {"a":"Drop cash emerald on hopper","e":"Hopper won't take it"}
+]},
+{"title":"4 · Admin commands","badge":"solo","tests":[
+ {"a":"/eco give <p> 5000","e":"+5000, both notified"},
+ {"a":"/eco take <p> 1000","e":"−1000"},
+ {"a":"/eco set <p> 250","e":"Exactly 250"},
+ {"a":"/eco reset <p>","e":"$0"},
+ {"a":"/jobadmin set <p> mayor","e":"Force-set, bypasses election"},
+ {"a":"/jobadmin clear <p>","e":"Back to Citizen"},
+ {"a":"/printeradmin give","e":"Free printer item"},
+ {"a":"/printeradmin list","e":"Active printer count"},
+ {"a":"/raidadmin clearcooldown","e":"Cooldowns cleared"},
+ {"a":"/partyadmin info <p>","e":"Party details or \"not in a party\""},
+ {"a":"Any admin cmd as non-op","e":"Denied"}
+]},
+{"title":"5 · Jobs","badge":"solo","tests":[
+ {"a":"/job list","e":"7 jobs with slots"},
+ {"a":"/job join police","e":"Joined + law kit given"},
+ {"a":"/job join chief (as police)","e":"Works — prereq met"},
+ {"a":"/job quit → /job join chief","e":"Fails — prereq lost"},
+ {"a":"5th player joins police (4 slots)","e":"Rejected, slots full"},
+ {"a":"/job join gangster","e":"Criminal team, lockpick given"}
+]},
+{"title":"6 · Law enforcement","badge":"2 players","tests":[
+ {"a":"/setjail main","e":"Jail set at your spot"},
+ {"a":"/wanted <P2> robbery","e":"Wanted broadcast"},
+ {"a":"/wanted","e":"Lists P2"},
+ {"a":"/arrest <P2>","e":"Teleported to jail, timer starts"},
+ {"a":"Jailed P2 walks >10 blocks","e":"Pulled back"},
+ {"a":"P2's sidebar","e":"Jail countdown"},
+ {"a":"/unarrest <P2>","e":"Released early"},
+ {"a":"/warrant <P2> drugs","e":"Warrant issued, auto-expires"},
+ {"a":"/lockdown toggle","e":"Slowness on non-police; off on second use"},
+ {"a":"/license grant → check → revoke","e":"All three work"},
+ {"a":"Restart while P2 wanted","e":"Still wanted after restart (MySQL)"}
+]},
+{"title":"7 · Law items","badge":"2 players","tests":[
+ {"a":"Arrest stick on wanted P2","e":"Jailed"},
+ {"a":"Unarrest stick on jailed P2","e":"Released"},
+ {"a":"Stun stick hit","e":"Slowness V + Weakness 3s"},
+ {"a":"Weapon checker on P2","e":"Inventory scan report","known":"v2 #12 — compass collides with Essentials jump, teleports you instead"},
+ {"a":"Throw/drop kit items","e":"Should be blocked","known":"v2 #11 — currently droppable"},
+ {"a":"Door ram on container (warrant, in claim)","e":"Opens it"},
+ {"a":"Lockpick container as gangster","e":"15s progress bar, opens"},
+ {"a":"Move mid-lockpick","e":"Cancels"},
+ {"a":"Lockpick as thief","e":"Faster — 10s"}
+]},
+{"title":"8 · Money printers","badge":"solo","tests":[
+ {"a":"Place printer, wait 1–2 min","e":"Accumulates"},
+ {"a":"Right-click printer","e":"Collects cash"},
+ {"a":"Non-owner right-clicks it","e":"\"This isn't your printer\""},
+ {"a":"Break printer","e":"Removed"},
+ {"a":"Place printer → restart server","e":"Still there and collecting after restart"}
+]},
+{"title":"9 · Party","badge":"2+ players","tests":[
+ {"a":"Create → invite → accept","e":"Both in, broadcasts"},
+ {"a":"Let an invite sit 60s","e":"Expires"},
+ {"a":"/p yo","e":"Purple party chat both see"},
+ {"a":"/party list","e":"Roles, online status, bank, FF"},
+ {"a":"/party deposit 1000 → /party bank","e":"Bank $1000"},
+ {"a":"Member tries /party withdraw","e":"Denied"},
+ {"a":"Promote to officer → withdraw","e":"Works now"},
+ {"a":"FF on → hit partner; FF off → hit again","e":"Damage, then blocked"},
+ {"a":"/party kick <P2>","e":"Kicked + notified"},
+ {"a":"/party role <P2> leader","e":"Transfers; you become officer"},
+ {"a":"Old leader tries disband","e":"Denied"},
+ {"a":"Leader disbands with money banked","e":"Bank split evenly"},
+ {"a":"Leader leaves (2+ remain)","e":"Leadership auto-passes"}
+]},
+{"title":"10 · Raids","badge":"2 players + WG claim","tests":[
+ {"a":"/advert raid near enemy claim","e":"Cost charged, broadcast, coords hidden"},
+ {"a":"Wait publish delay","e":"Coords broadcast, boss bar, ACTIVE"},
+ {"a":"Uninvolved P2 enters bubble","e":"Walk-in prompt"},
+ {"a":"/advert defend","e":"Joins defenders"},
+ {"a":"/advert counter","e":"Joins attackers"},
+ {"a":"Attacker breaks blocks in claim","e":"Allowed during raid"},
+ {"a":"Loot a chest in bubble","e":"Raid marked legit"},
+ {"a":"PvP inside bubble","e":"Works regardless of overworld setting"},
+ {"a":"Boss bar","e":"Destruction % + time remaining"},
+ {"a":"All attackers leave 10s+","e":"\"Abandoned\" → raid ends"},
+ {"a":"Legit raid ends","e":"Destruction %, loot, cooldown broadcast"},
+ {"a":"No-loot no-PvP raid ends","e":"\"Illegitimate — no cooldown\""},
+ {"a":"Re-raid same base immediately","e":"Blocked by cooldown"},
+ {"a":"Party member enters bubble (partner attacking)","e":"Auto-joins attacker side"},
+ {"a":"/raidadmin end inside raid","e":"Force-ends"}
+]},
+{"title":"11 · Mugging","badge":"2 players","tests":[
+ {"a":"/advert mug <P2> 500 within 6 blocks","e":"P2 gets demand prompt"},
+ {"a":"Mug from 10+ blocks","e":"Rejected — too far"},
+ {"a":"Hit each other during window","e":"PvP works (pair only)"},
+ {"a":"Bystander attacks either","e":"Still blocked"},
+ {"a":"P2 pays the demand via /pay","e":"Auto-resolves as complied"},
+ {"a":"Let 30s pass","e":"Window closes, PvP blocked again"}
+]},
+{"title":"12 · Social","badge":"2 players, same team","tests":[
+ {"a":"/g hello","e":"Team-only, color-coded"},
+ {"a":"/g alone","e":"Toggles group-chat mode"},
+ {"a":"/agenda set → P2 /agenda","e":"P2 sees it"},
+ {"a":"/vote start mayor → both vote","e":"Election runs, winner seated"},
+ {"a":"/demote <P2> → team votes yes","e":"P2 → Citizen + group ban"}
+]},
+{"title":"13 · Scoreboard & stats","badge":"solo","tests":[
+ {"a":"/sidebar off → /sidebar","e":"Hides / shows"},
+ {"a":"Kill P2 → /stats","e":"K/D updated"},
+ {"a":"/stats <P2>","e":"Their stats"}
+]},
+{"title":"14 · Known gaps — expected to fail (already v2)","badge":"solo","tests":[
+ {"a":"Restart → /stats","e":"K/D resets","known":"v2 #4 — stats are in-memory"},
+ {"a":"Restart while in a party","e":"Party gone","known":"v2 #5 — session-only"},
+ {"a":"Restart with addon entities placed","e":"Tracking lost","known":"v2 #3 — printers are the exception"},
+ {"a":"Tab list / action bar","e":"Plain","known":"v2 #6 — not built yet"}
+]}
+]
